@@ -9,8 +9,9 @@ const resultIcon = document.getElementById('result-icon');
 // Function to check the grade
 function checkGrade() {
   const cgpa = parseFloat(input.value);
-
-  // Stop any currently playing sounds
+  const button = document.querySelector('button');
+  button.classList.add('loading');
+  button.disabled = true;
   const sounds = ['success-Sound', 'failure-Sound', 'kill-Sound', 'giveaway-Sound', 'oh-chim-Sound', 'secondfail-Sound'];
   sounds.forEach(id => {
     const audio = document.getElementById(id);
@@ -28,6 +29,8 @@ function checkGrade() {
   // Check if input is valid
   if (isNaN(cgpa) || cgpa < 0 || cgpa > 5) {
     errorMsg.style.display = 'block';
+    button.classList.remove('loading');
+    button.disabled = false;
     return;
   }
 
@@ -36,12 +39,14 @@ function checkGrade() {
   let range = '';
   let bgColor = '';
   let textColor = '';
+  let icon = '';
 
   if (cgpa >= 4.50) {
     grade = 'First Class Honours';
     range = '4.50 – 5.00';
     bgColor = '#EAF3DE';
     textColor = '#27500A';
+    icon = '🎉';
     // Play success sound
     const successSound = document.getElementById('success-Sound');
     successSound.play();
@@ -51,6 +56,7 @@ function checkGrade() {
     range = '3.50 – 4.49';
     bgColor = '#E6F1FB';
     textColor = '#0C447C';
+    icon = '👏';
     // play kill sound
     const killSound = document.getElementById('kill-Sound');
     killSound.play();
@@ -59,6 +65,7 @@ function checkGrade() {
     range = '2.40 – 3.49';
     bgColor = '#FAEEDA';
     textColor = '#633806';
+    icon = '👍';
     // play giveaway sound
     const giveawaySound = document.getElementById('giveaway-Sound');
     giveawaySound.play();
@@ -67,6 +74,7 @@ function checkGrade() {
     range = '1.50 – 2.39';
     bgColor = '#FAECE7';
     textColor = '#712B13';
+    icon = '🤔';
     // play oh chim sound
     const ohChimSound = document.getElementById('oh-chim-Sound');
     ohChimSound.play();
@@ -75,6 +83,7 @@ function checkGrade() {
     range = '1.00 – 1.49';
     bgColor = '#FCEBEB';
     textColor = '#791F1F';
+    icon = '😅';
     // play second faiilure sound
     const SecondFailSound = document.getElementById('secondfail-Sound');
     SecondFailSound.play();
@@ -83,6 +92,7 @@ function checkGrade() {
     range = '0.00 – 0.99';
     bgColor = '#f8f9fa';
     textColor = '#6c757d';
+    icon = '😢';
     // Play failure sound
     const failureSound = document.getElementById('failure-Sound');
     failureSound.play();
@@ -91,12 +101,16 @@ function checkGrade() {
   // Show the result
   resultClass.textContent = grade;
   resultClass.style.color = textColor;
-  // resultRange.textContent = 'CGPA range: ' + range;
+  resultIcon.textContent = icon;
   resultIcon.style.color = textColor;
   resultBox.style.background = bgColor;
   resultBox.style.border = '1px solid ' + textColor + '44';
   resultBox.style.display = 'block';
-  setTimeout(() => resultBox.classList.add('show'), 10);
+  setTimeout(() => {
+    resultBox.classList.add('show');
+    button.classList.remove('loading');
+    button.disabled = false;
+  }, 10);
 }
 
 // Check grade when pressing Enter
@@ -104,4 +118,16 @@ input.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     checkGrade();
   }
+});
+
+// Stop all sounds when leaving the page
+window.addEventListener('beforeunload', function() {
+  const sounds = ['success-Sound', 'failure-Sound', 'kill-Sound', 'giveaway-Sound', 'oh-chim-Sound', 'secondfail-Sound'];
+  sounds.forEach(id => {
+    const audio = document.getElementById(id);
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  });
 });
